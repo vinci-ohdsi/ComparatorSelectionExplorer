@@ -65,7 +65,8 @@ select cohort_definition_id, covariate_id, covariate_mean from #cov_summary;
 
 insert into @results_database_schema.@covariate_def_table (covariate_id, covariate_name, covariate_type)
 select distinct
-	covariate_id, 'Age decile: ' || cast(right(covariate_id, 2) as int)*10 || ' - ' || (cast(right(covariate_id, 2) as int)+1)*10-1 as covariate_name,
+	covariate_id,
+	concat('Age decile: ', cast(right(covariate_id, 2) as int)*10,  ' - ',  (cast(right(covariate_id, 2) as int)+1)*10-1) as covariate_name,
 	'Demographics' as covariate_type
 from #cov_summary
 ;
@@ -100,7 +101,8 @@ select cohort_definition_id, covariate_id, covariate_mean from #cov_summary;
 
 insert into @results_database_schema.@covariate_def_table (covariate_id, covariate_name, covariate_type)
 select
-	covariate_id, 'Sex: ' || c1.concept_name as covariate_name,
+	covariate_id,
+	concat('Sex: ', c1.concept_name) as covariate_name,
 	'Demographics' as covariate_type
 from
 (select distinct covariate_id from #cov_summary) cs1
@@ -141,7 +143,7 @@ select cohort_definition_id, covariate_id, covariate_mean from #cov_summary;
 insert into @results_database_schema.@covariate_def_table (covariate_id, covariate_name, concept_id, time_at_risk_start, time_at_risk_end, covariate_type)
 select
 	covariate_id,
-	'Condition in <=30d prior: ' || c1.concept_name as covariate_name,
+	concat('Condition in <=30d prior: ', c1.concept_name) as covariate_name,
 	covariate_id as concept_id,
 	-30 as time_at_risk_start,
 	0 as time_at_risk_end,
@@ -184,7 +186,7 @@ select cohort_definition_id, covariate_id, covariate_mean from #cov_summary;
 insert into @results_database_schema.@covariate_def_table (covariate_id, covariate_name, concept_id, time_at_risk_start, time_at_risk_end, covariate_type)
 select
 	covariate_id,
-	'Condition in >30d prior: ' || c1.concept_name as covariate_name,
+	concat('Condition in >30d prior: ', c1.concept_name) as covariate_name,
 	covariate_id/1000 as concept_id,
 	-999 as time_at_risk_start,
 	-30 as time_at_risk_end,
@@ -221,7 +223,7 @@ select cohort_definition_id, covariate_id, covariate_mean from #cov_summary;
 
 
 insert into @results_database_schema.@covariate_def_table (covariate_id, covariate_name, concept_id, time_at_risk_start, time_at_risk_end, covariate_type)
-select covariate_id, 'Drug with start >30d prior: ' || c1.concept_name as covariate_name, covariate_id/1000 as concept_id, 0 as time_at_risk_start, 30 as time_at_risk_end, 'prior meds' as covariate_type
+select covariate_id, concat('Drug with start >30d prior: ', c1.concept_name) as covariate_name, covariate_id/1000 as concept_id, 0 as time_at_risk_start, 30 as time_at_risk_end, 'prior meds' as covariate_type
 from
 (select distinct covariate_id from #cov_summary) cs1
 inner join @cdm_database_schema.concept c1
@@ -372,7 +374,7 @@ select cohort_definition_id, covariate_id, covariate_mean from #cov_summary;
 insert into @results_database_schema.@covariate_def_table (covariate_id, covariate_name, concept_id, time_at_risk_start, time_at_risk_end, covariate_type)
 select
 	covariate_id,
-	'concept co-occurrence: ' || c1.concept_name as covariate_name,
+	concat('concept co-occurrence: ', c1.concept_name) as covariate_name,
 	covariate_id/-1 as concept_id,   --normalize back to conceptId from the mask
 	0 as time_at_risk_start,
 	0 as time_at_risk_end,
